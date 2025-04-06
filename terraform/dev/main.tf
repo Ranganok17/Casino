@@ -90,10 +90,27 @@ resource "aws_sqs_queue" "main_queue" {
   tags = var.common_tags
 }
 
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.14.2"
+  
+  name = "eks-vpc-${var.env}"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnets = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+  enable_nat_gateway = true
+  single_nat_gateway = true
+
+  tags = var.common_tags
+}
+
 module "eks_cluster" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "~> 20.0"
-  cluster_name    = "myapp-cluster-${var.env}"
+  cluster_name    = "radu-casino-${var.env}"
   cluster_version = "1.27"
   vpc_id          = var.vpc_id
   subnet_ids      = module.vpc.private_subnets
