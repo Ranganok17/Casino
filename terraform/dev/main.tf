@@ -96,7 +96,7 @@ module "eks_cluster" {
   cluster_name    = "myapp-cluster-${var.env}"
   cluster_version = "1.27"
   vpc_id          = var.vpc_id
-  subnet_ids      = var.subnet_ids
+  subnet_ids      = module.vpc.private_subnets
 
   node_groups = {
     default = {
