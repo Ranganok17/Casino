@@ -23,12 +23,32 @@ resource "aws_iam_role_policy_attachment" "lambda_xray" {
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
+resource "aws_iam_role_policy" "lambda_sqs_policy" {
+  name = "lambda-sqs-policy-${var.env}"
+  role = aws_iam_role.lambda_exec_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource = aws_sqs_queue.main_queue.arn
+      }
+    ]
+  })
+}
+
 resource "aws_lambda_function" "dataProcessor" {
   function_name    = "data-processor-${var.env}"
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "index.handler"
   runtime          = "nodejs18.x"
-  filename         = "${path.module}/lambda_function.zip"  
+  filename         = "${path.module}/../lambda_function.zip"  
   source_code_hash = filebase64sha256("${path.module}/../lambda_function.zip")
 
   tracing_config {
@@ -92,7 +112,7 @@ resource "aws_sqs_queue" "main_queue" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.2"
+  version = "5.19.0"
   
   name = "eks-vpc-${var.env}"
   cidr = "10.0.0.0/16"
@@ -112,10 +132,10 @@ module "eks_cluster" {
   version         = "~> 20.0"
   cluster_name    = "radu-casino-${var.env}"
   cluster_version = "1.27"
-  vpc_id          = var.vpc_id
+  vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.private_subnets
 
-  node_groups = {
+  eks_managed_node_groups = {
     default = {
       desired_capacity = 3
       max_capacity     = 3

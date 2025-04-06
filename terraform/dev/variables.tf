@@ -12,13 +12,3 @@ variable "common_tags" {
     Environment = "dev"
   }
 }
-
-variable "vpc_id" {
-  description = "ID of the VPC where resources will be deployed"
-  type        = string
-}
-
-variable "subnet_ids" {
-  description = "List of subnet IDs for EKS"
-  type        = list(string)
-}
