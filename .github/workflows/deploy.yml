@@ -53,8 +53,8 @@ jobs:
       - name: Patch kubeconfig for interactiveMode
         run: |
           sed -i '/env: null/ s/$/\n        interactiveMode: Never/' ~/.kube/config    
-      - name: Verify Kubernetes Connection
-        run: kubectl get nodes             
+      - name: Show patched kubeconfig
+        run: cat ~/.kube/config            
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
       - name: Deploy Kubernetes Manifests
