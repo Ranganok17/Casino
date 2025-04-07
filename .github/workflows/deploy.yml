@@ -54,13 +54,6 @@ jobs:
         run: |
           # Insert "interactiveMode: Never" in the exec block if it doesn't exist
           sed -i '/exec:/a\        interactiveMode: Never' ~/.kube/config   
-      - name: Show current identity
-        run: |
-          aws sts get-caller-identity
-      - name: Show current kubeconfig and context
-        run: |
-          kubectl config current-context
-          kubectl config view
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
       - name: Deploy Kubernetes Manifests
