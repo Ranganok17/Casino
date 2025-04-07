@@ -1,0 +1,48 @@
+name: Deploy Infra and App
+
+permissions:
+  id-token: write   # allow requesting the OIDC JWT token
+  contents: read    # allow reading the repo
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: '1.5.7'
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
+          aws-region: eu-central-1
+      - name: Terraform Init
+        run: terraform -chdir=terraform/dev init -upgrade
+      - name: Terraform Plan
+        run: terraform -chdir=terraform/dev plan
+      - name: Terraform Apply
+        run: terraform -chdir=terraform/dev apply -auto-approve
+
+  deploy_k8s:
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
+          aws-region: eu-central-1
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1 --role-arn ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
+      - name: Verify Kubernetes Connection
+        run: kubectl get nodes
+      - name: Deploy Kubernetes Manifests
+        run: kubectl apply -f k8s/ --recursive

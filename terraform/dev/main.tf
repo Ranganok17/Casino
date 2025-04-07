@@ -94,13 +94,13 @@ resource "aws_dynamodb_table" "users" {
 }
 
 resource "aws_sqs_queue" "dead_letter" {
-  name                      = "myapp-dlq-${var.env}"
+  name                      = "casino-dlq-${var.env}"
   message_retention_seconds = 1209600  # 14 days retention
   tags                      = var.common_tags
 }
 
 resource "aws_sqs_queue" "main_queue" {
-  name                      = "myapp-queue-${var.env}"
+  name                      = "casino-queue-${var.env}"
   visibility_timeout_seconds = 180
   message_retention_seconds  = 345600
   redrive_policy = jsonencode({
