@@ -48,6 +48,8 @@ jobs:
           aws-region: eu-central-1
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1 --output json
+      - name: Update kubeconfig exec API version
+        run: sed -i 's/client.authentication.k8s.io\/v1beta1/client.authentication.k8s.io\/v1/g' ~/.kube/config   
       - name: Show current identity
         run: |
           aws sts get-caller-identity
