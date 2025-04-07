@@ -52,8 +52,7 @@ jobs:
         run: sed -i 's/client.authentication.k8s.io\/v1beta1/client.authentication.k8s.io\/v1/g' ~/.kube/config
       - name: Patch kubeconfig for interactiveMode
         run: |
-          # Insert "interactiveMode: Never" in the exec block if it doesn't exist
-          sed -i '/exec:/a\        interactiveMode: Never' ~/.kube/config   
+          sed -i 's/interactiveMode: IfAvailable/interactiveMode: Never/' ~/.kube/config   
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
       - name: Deploy Kubernetes Manifests
