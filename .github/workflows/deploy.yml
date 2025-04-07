@@ -49,7 +49,6 @@ jobs:
           aws-region: eu-central-1
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
-        
       - name: Install yq
         run: |
           mkdir -p $HOME/bin
@@ -61,8 +60,7 @@ jobs:
           run: |
             # The AWS CLI's get-token call still returns "v1beta1", so keep v1beta1
             yq eval '.users[].user.exec.apiVersion = "client.authentication.k8s.io/v1beta1"' -i ~/.kube/config
-            yq eval '.users[].user.exec.interactiveMode = "Never"' -i ~/.kube/config   
-
+            yq eval '.users[].user.exec.interactiveMode = "Never"' -i ~/.kube/config    
       - name: Show patched kubeconfig
         run: |
           cat ~/.kube/config
