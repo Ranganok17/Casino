@@ -47,7 +47,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1 --output json
+        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1 --interactive-mode Never
       - name: Update kubeconfig exec API version
         run: sed -i 's/client.authentication.k8s.io\/v1beta1/client.authentication.k8s.io\/v1/g' ~/.kube/config   
       - name: Show current identity
