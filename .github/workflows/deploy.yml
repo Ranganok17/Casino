@@ -42,6 +42,10 @@ jobs:
           aws-region: eu-central-1
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
+      - name: Show current kubeconfig and context
+        run: |
+          kubectl config current-context
+          kubectl config view
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
       - name: Deploy Kubernetes Manifests
