@@ -47,7 +47,10 @@ jobs:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
+        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1 --output json
+      - name: Show current identity
+        run: |
+          aws sts get-caller-identity
       - name: Show current kubeconfig and context
         run: |
           kubectl config current-context
