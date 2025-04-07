@@ -131,7 +131,7 @@ module "eks_cluster" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "~> 20.0"
   cluster_name    = "radu-casino-${var.env}"
-  cluster_version = "1.36"
+  cluster_version = "1.32"
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.private_subnets
 
