@@ -51,7 +51,7 @@ jobs:
       - name: Update kubeconfig exec API version
         run: sed -i 's/client.authentication.k8s.io\/v1beta1/client.authentication.k8s.io\/v1/g' ~/.kube/config
       - name: Patch kubeconfig for interactiveMode
-        run: sed -i 's/env: null/env: null\n        interactiveMode: Never/' ~/.kube/config
+        run: sed -i $'s/env: null/env: null\n        interactiveMode: Never/' ~/.kube/config
       - name: Verify Kubernetes Connection
         run: kubectl get nodes             
       - name: Verify Kubernetes Connection
