@@ -1,5 +1,9 @@
 name: Deploy Infra and App
 
+permissions:
+    id-token: write   # allow requesting the OIDC JWT token
+    contents: read    # allow reading the repo (for actions/checkout)
+
 on:
   push:
     branches: ["main"]
@@ -35,3 +39,4 @@ jobs:
         run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
       - name: Deploy Kubernetes Manifests
         run: kubectl apply -f k8s/ --recursive
+
