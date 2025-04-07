@@ -49,6 +49,7 @@ jobs:
           aws-region: eu-central-1
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
+        
       - name: Install yq
         run: |
           mkdir -p $HOME/bin
@@ -56,19 +57,23 @@ jobs:
           chmod +x $HOME/bin/yq
           export PATH=$HOME/bin:$PATH
           yq --version
-      - name: Patch kubeconfig for exec token retrieval
-        run: |
-          yq eval '.users[].user.exec.apiVersion = "client.authentication.k8s.io/v1beta1"' -i ~/.kube/config
-          yq eval '.users[].user.exec.interactiveMode = "Never"' -i ~/.kube/config   
+          - name: Patch kubeconfig for v1beta1 + interactiveMode
+          run: |
+            # The AWS CLI's get-token call still returns "v1beta1", so keep v1beta1
+            yq eval '.users[].user.exec.apiVersion = "client.authentication.k8s.io/v1beta1"' -i ~/.kube/config
+            yq eval '.users[].user.exec.interactiveMode = "Never"' -i ~/.kube/config   
+
       - name: Show patched kubeconfig
-        run: cat ~/.kube/config
-      - name: Debug get-token
-        run: aws eks get-token --region eu-central-1 --cluster-name radu-casino-dev --output json                
-      - name: Verify Kubernetes Connection without static env
         run: |
-          # Unset AWS credentials environment variables so they don’t interfere with the exec plugin
-          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN kubectl get nodes      
+          cat ~/.kube/config
+  
+      - name: Debug get-token
+        run: |
+          # This should succeed and return a token
+          aws eks get-token --region eu-central-1 --cluster-name radu-casino-dev --output json
+  
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
+    
       - name: Deploy Kubernetes Manifests
         run: kubectl apply -f k8s/ --recursive
