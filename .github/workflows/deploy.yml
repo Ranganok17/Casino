@@ -64,6 +64,10 @@ jobs:
         run: cat ~/.kube/config
       - name: Debug get-token
         run: aws eks get-token --region eu-central-1 --cluster-name radu-casino-dev --output json                
+      - name: Verify Kubernetes Connection without static env
+        run: |
+          # Unset AWS credentials environment variables so they don’t interfere with the exec plugin
+          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN kubectl get nodes      
       - name: Verify Kubernetes Connection
         run: kubectl get nodes
       - name: Deploy Kubernetes Manifests
