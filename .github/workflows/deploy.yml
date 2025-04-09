@@ -34,11 +34,23 @@ jobs:
           sudo ./aws/install --update
           aws --version
               
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (Dev)
+        if: env.ENVIRONMENT == 'dev'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
+      - name: Configure AWS Credentials (Prod)
+        if: env.ENVIRONMENT == 'prod'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_PROD }}
+          aws-region: eu-central-1
+      - name: Build Lambda Deployment Package
+        working-directory: lambda
+        run: |
+          npm install            # Install dependencies from package.json
+          7z a -tzip deployment_package.zip .   # Package all files into a zip file 
       - name: Terraform Init
         run: terraform -chdir=terraform/${{env.ENVIRONMENT}} init -upgrade
       - name: Terraform Plan
@@ -53,10 +65,17 @@ jobs:
       ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
     steps:
       - uses: actions/checkout@v3
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (Dev)
+        if: env.ENVIRONMENT == 'dev'
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
+          aws-region: eu-central-1
+      - name: Configure AWS Credentials (Prod)
+        if: env.ENVIRONMENT == 'prod'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_PROD }}
           aws-region: eu-central-1
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-${{env.ENVIRONMENT}} --region eu-central-1
