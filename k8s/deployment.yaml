@@ -1,10 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-world-${ENVIRONMENT}
+  name: hello-world
   labels:
     app: hello-world
-    env: ${ENVIRONMENT}
 spec:
   replicas: 3
   selector:
