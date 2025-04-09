@@ -47,6 +47,8 @@ jobs:
   deploy_k8s:
     runs-on: ubuntu-latest
     needs: terraform
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS Credentials
