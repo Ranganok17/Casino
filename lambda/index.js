@@ -1,27 +1,31 @@
+// Updated code example
 const AWS = require('aws-sdk');
-
-// Initialize the DynamoDB Document Client
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    // Parse the SQS message body
-    const messageBody = JSON.parse(event.Records[0].body);
+  const messageBody = JSON.parse(event.Records[0].body);
 
-    // Define the parameters for the DynamoDB put operation
-    const params = {
-        TableName: 'users', // Replace with your DynamoDB table name
-        Item: {
-            id: messageBody.id,       // Replace with the actual attribute from your message
-            userId: messageBody.userId, // Replace with the actual attribute from your message
-            // Add other attributes as needed
-        },
-    };
+  // Read the table name from the environment variable DYNAMODB_TABLE
+  const tableName = process.env.DYNAMODB_TABLE;
+  if (!tableName) {
+    console.error("DYNAMODB_TABLE is not set");
+    throw new Error("DYNAMODB_TABLE environment variable is required");
+  }
 
-    try {
-        // Perform the put operation
-        await dynamoDb.put(params).promise();
-        console.log(`Successfully wrote item with id ${messageBody.id} to DynamoDB.`);
-    } catch (error) {
-        console.error(`Error writing to DynamoDB: ${error}`);
-    }
+  const params = {
+    TableName: tableName,
+    Item: {
+      id: messageBody.id,
+      userId: messageBody.userId,
+      // ... other attributes
+    },
+  };
+
+  try {
+    await dynamoDb.put(params).promise();
+    console.log(`Successfully wrote item with id ${messageBody.id} to ${tableName}`);
+  } catch (error) {
+    console.error('Error writing to DynamoDB: ', error);
+    throw error;
+  }
 };

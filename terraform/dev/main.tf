@@ -76,6 +76,13 @@ resource "aws_lambda_function" "dataProcessor" {
     mode = "Active"
   }
 
+  environment {
+    variables = {
+      DYNAMODB_TABLE = "users-${var.env}"  // For dev, this becomes users-dev; for prod, users-prod
+      // Add other environment variables as needed
+    }
+  }
+
   tags = var.common_tags
 }
 
