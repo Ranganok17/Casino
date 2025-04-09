@@ -59,7 +59,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name radu-casino-{{ env.ENVIRONMENT }} --region eu-central-1
+        run: aws eks update-kubeconfig --name radu-casino-${{env.ENVIRONMENT}} --region eu-central-1
       - name: Install yq
         run: |
           mkdir -p $HOME/bin
@@ -80,7 +80,7 @@ jobs:
       - name: Debug get-token
         run: |
           # This should succeed and return a token
-          aws eks get-token --region eu-central-1 --cluster-name radu-casino-{{ env.ENVIRONMENT }} --output json
+          aws eks get-token --region eu-central-1 --cluster-name radu-casino-${{env.ENVIRONMENT}} --output json
   
       - name: Deploy Kubernetes Manifests
         run: kubectl apply -f k8s/ --recursive
