@@ -50,6 +50,8 @@ jobs:
         working-directory: lambda
         run: |
           npm install            # Install dependencies from package.json
+          npm prune --production # Cleanup node_modules
+          npm dedupe
           7z a -tzip deployment_package.zip .   # Package all files into a zip file 
       - name: Terraform Init
         run: terraform -chdir=terraform/${{env.ENVIRONMENT}} init -upgrade
