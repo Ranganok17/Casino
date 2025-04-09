@@ -23,6 +23,27 @@ resource "aws_iam_role_policy_attachment" "lambda_xray" {
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
+# Allow Lambda to write to DynamoDB table
+resource "aws_iam_role_policy" "lambda_dynamo_policy" {
+  name = "lambda-dynamo-policy-${var.env}"
+  role = aws_iam_role.lambda_exec_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:GetItem"
+        ],
+        Resource = aws_dynamodb_table.users.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "lambda_sqs_policy" {
   name = "lambda-sqs-policy-${var.env}"
   role = aws_iam_role.lambda_exec_role.id
