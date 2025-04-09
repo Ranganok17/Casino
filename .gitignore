@@ -36,5 +36,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+#Ignore Lambda deployment Packages
+lambda/deployment_package.zip
+
 
 
