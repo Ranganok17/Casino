@@ -9,6 +9,6 @@ variable "common_tags" {
   type        = map(string)
   default = {
     Project     = "CasinoDevOpsTest"
-    Environment = "prod"
+    Environment = var.env
   }
 }

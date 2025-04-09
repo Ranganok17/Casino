@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-world
+  name: hello-world-${ENVIRONMENT}
   labels:
     app: hello-world
+    env: ${ENVIRONMENT}
 spec:
   replicas: 3
   selector:
@@ -33,6 +34,13 @@ spec:
       containers:
         - name: hello-world
           image: pvermeyden/nodejs-hello-world:latest
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
           ports:
             - containerPort: 80
           volumeMounts:
