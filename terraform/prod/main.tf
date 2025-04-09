@@ -69,11 +69,18 @@ resource "aws_lambda_function" "dataProcessor" {
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "index.handler"
   runtime          = "nodejs18.x"
-  filename         = "${path.module}/../../lambda//deployment_package.zip"  
+  filename         = "${path.module}/../../lambda/deployment_package.zip"  
   source_code_hash = filebase64sha256("${path.module}/../../lambda/deployment_package.zip")
 
   tracing_config {
     mode = "Active"
+  }
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = "users-${var.env}"  // For dev, this becomes users-dev; for prod, users-prod
+      // Add other environment variables as needed
+    }
   }
 
   tags = var.common_tags
