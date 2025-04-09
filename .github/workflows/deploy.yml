@@ -7,6 +7,13 @@ permissions:
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (e.g. dev or prod)'
+        required: true
+        default: 'dev'
+        type: string
 
 jobs:
   terraform:
@@ -31,11 +38,11 @@ jobs:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
       - name: Terraform Init
-        run: terraform -chdir=terraform/dev init -upgrade
+        run: terraform -chdir=terraform/{{ env.ENVIRONMENT }} init -upgrade
       - name: Terraform Plan
-        run: terraform -chdir=terraform/dev plan
+        run: terraform -chdir=terraform/{{ env.ENVIRONMENT }} plan
       - name: Terraform Apply
-        run: terraform -chdir=terraform/dev apply -auto-approve
+        run: terraform -chdir=terraform/{{ env.ENVIRONMENT }} apply -auto-approve
 
   deploy_k8s:
     runs-on: ubuntu-latest
@@ -48,7 +55,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_DEV }}
           aws-region: eu-central-1
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name radu-casino-dev --region eu-central-1
+        run: aws eks update-kubeconfig --name radu-casino-{{ env.ENVIRONMENT }} --region eu-central-1
       - name: Install yq
         run: |
           mkdir -p $HOME/bin
@@ -69,7 +76,7 @@ jobs:
       - name: Debug get-token
         run: |
           # This should succeed and return a token
-          aws eks get-token --region eu-central-1 --cluster-name radu-casino-dev --output json
+          aws eks get-token --region eu-central-1 --cluster-name radu-casino-{{ env.ENVIRONMENT }} --output json
   
       - name: Deploy Kubernetes Manifests
         run: kubectl apply -f k8s/ --recursive
