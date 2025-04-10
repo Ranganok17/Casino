@@ -1,0 +1,17 @@
+env: dev
+replicaCount: 3
+image:
+  repository: pvermeyden/nodejs-hello-world
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 80
+ingress:
+  enabled: true
+  hostname: "dev.myapp.example.com"  # default for dev; override in values-prod.yaml
+  path: /helloWorld
+resources: {}  # You can set resource requests/limits
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -5,5 +5,6 @@ metadata:
 data:
   config.json: |
     {
-      "message": "Hello from ConfigMap!"
+      "env": "{{ .Values.env }}"
+      // ...other configuration values...
     }

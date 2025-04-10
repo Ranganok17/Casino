@@ -1,0 +1,4 @@
+env: dev
+replicaCount: 3
+ingress:
+  hostname: "dev.myapp.example.com"

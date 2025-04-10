@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: ["main"]
+    branches: ["helm"]
   workflow_dispatch:
     inputs:
       environment:
@@ -60,7 +60,7 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=terraform/${{env.ENVIRONMENT}} apply -auto-approve
 
-  deploy_k8s:
+  deploy_helm:
     runs-on: ubuntu-latest
     needs: terraform
     env:
@@ -103,5 +103,9 @@ jobs:
           # This should succeed and return a token
           aws eks get-token --region eu-central-1 --cluster-name radu-casino-${{env.ENVIRONMENT}} --output json
   
-      - name: Deploy Kubernetes Manifests
-        run: kubectl apply -f k8s/ --recursive
+      - name: Deploy Helm Chart (Dev)
+        if: env.ENVIRONMENT == 'dev'
+        run: helm upgrade --install hello-world helm/hello-world -f helm/hello-world/values-dev.yaml
+      - name: Deploy Helm Chart (Prod)
+        if: env.ENVIRONMENT == 'prod'
+        run: helm upgrade --install hello-world helm/hello-world -f helm/hello-world/values-prod.yaml

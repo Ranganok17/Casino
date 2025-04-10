@@ -1,9 +1,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: hello-world-pdb
+  name: hello-world-pdb-{{ .Values.env }}
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: hello-world
