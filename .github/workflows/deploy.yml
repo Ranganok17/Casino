@@ -85,7 +85,7 @@ jobs:
           kubectl create namespace casino --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name radu-casino-${{env.ENVIRONMENT}} --region eu-central-1
+        run: aws eks update-kubeconfig --name radu-casino-${{env.ENVIRONMENT}} --region eu-central-1 --namespace casino
       - name: Install yq
         run: |
           mkdir -p $HOME/bin
