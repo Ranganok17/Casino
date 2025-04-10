@@ -79,6 +79,11 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN_PROD }}
           aws-region: eu-central-1
+
+      - name: Create Namespace (casino) if not exists
+        run: |
+          kubectl create namespace casino --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name radu-casino-${{env.ENVIRONMENT}} --region eu-central-1
       - name: Install yq
@@ -103,9 +108,8 @@ jobs:
           # This should succeed and return a token
           aws eks get-token --region eu-central-1 --cluster-name radu-casino-${{env.ENVIRONMENT}} --output json
   
-      - name: Deploy Helm Chart (Dev)
-        if: env.ENVIRONMENT == 'dev'
-        run: helm upgrade --install hello-world helm/hello-world -f helm/hello-world/values-dev.yaml
-      - name: Deploy Helm Chart (Prod)
-        if: env.ENVIRONMENT == 'prod'
-        run: helm upgrade --install hello-world helm/hello-world -f helm/hello-world/values-prod.yaml
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install hello-world helm/hello-world \
+            -f helm/hello-world/values-${{ env.ENVIRONMENT }}.yaml \
+            --namespace casino
